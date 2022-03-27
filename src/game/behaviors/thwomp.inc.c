@@ -58,6 +58,44 @@ ObjActionFunc sGrindelThwompActions[] = {
 void bhv_grindel_thwomp_loop(void) {
     cur_obj_call_action_function(sGrindelThwompActions);
 }
+
+/********************************************
+***********     SIDEWAYS THWOMPS ************
+*********************************************
+Generates 2 raycast boxes, the bigger one for the peeking
+and the smaller for activation
+*/
+// ro = ray origin
+// rd = ray direction
+/*s32 boxIntersection(Vec3f orig, Vec3f dir, Vec3f boxSize) 
+{
+    Vec3f m = dir; // can precompute if traversing a set of aligned boxes
+    Vec3f n = m*orig;   // can precompute if traversing a set of aligned boxes
+    Vec3f k = abs(m)*boxSize;
+    Vec3f t1 = -n - k;
+    Vec3f t2 = -n + k;
+    //f32 tN = max( max( t1.x, t1.y ), t1.z );
+    //f32 tF = min( min( t2.x, t2.y ), t2.z );
+    if (gMarioObject->oPosX + gMarioObject->radius < t1.x &&
+        gMarioObject->oPosZ + gMarioObject->radius < t1.z &&
+        gMarioObject->oPosY + gMarioObject->radius < t1.y )
+        return TRUE;
+    else return FALSE;
+}*/
+
+void bhv_sideways_thwomp_loop(void) {
+    if (gMarioObject->oPosX >= o->oPosX - 1000 &&
+        gMarioObject->oPosX <= o->oPosX - 100  &&
+        gMarioObject->oPosZ <= o->oPosZ + 200  &&
+        gMarioObject->oPosZ >= o->oPosZ - 200  &&
+        gMarioObject->oPosY <= o->oPosY + 500  &&
+        gMarioObject->oPosY >= o->oPosY - 200 )
+        print_text(0,0, "WORKS");
+}
+
+
+
+
 /********************************************
  *********    THWIMPS   *********************
  ********************************************
@@ -81,36 +119,41 @@ static struct ObjectHitbox sThwimpHitbox = {
 
 #define THWIMP_ACT_ON_GROUND 0
 #define THWIMP_ACT_JUMP 1
-u8 cycle;
-s32 xRange;
-s32 yRange;
-void bhv_thwimp_init(void) {
-    cycle = 1;
-   // if (GET_BPARAM1(o->oBehParams) == 0x01)
-   //     o->oFaceAngleYaw += DEGREES(90);
+#define X_AXIS_THWIMP 0
+#define Z_AXIS_THWIMP 1
+#define OCTAGONAL_THWIMP 2
 
-    xRange = GET_BPARAM2(o->oBehParams);
-    yRange = GET_BPARAM3(o->oBehParams);
+void bhv_thwimp_init(void) {
+    o->oThwimpCycle = 1;
+    if (GET_BPARAM1(o->oBehParams) == 0x01) {
+        o->oMoveAngleYaw += DEGREES(90);
+        o->oThwimpType = Z_AXIS_THWIMP;
+        o->oTimer = 20;
+    } else if (GET_BPARAM1(o->oBehParams) == 0x02) o->oThwimpType = OCTAGONAL_THWIMP;
+    else o->oThwimpType = X_AXIS_THWIMP;
+
+    o->oThwimpXRange = GET_BPARAM2(o->oBehParams);
+    o->oThwimpYRange = GET_BPARAM3(o->oBehParams);
 }
 void thwimp_act_on_ground(void) {
     if (o->oTimer > 20) {
         o->oAction = THWIMP_ACT_JUMP;
         o->oTimer = 0;
-        if (cycle > 1) cycle = 1;
-        else cycle = 2;
+        if (o->oThwimpCycle > 1) o->oThwimpCycle = 1;
+        else o->oThwimpCycle = 2;
     }
 }
 
 void thwimp_act_jump(void) {
     if (o->oTimer == 0) o->oThwompRandomTimer = random_u16() %5;
     s32 x = (1.5*o->oTimer - 20);
-    o->oPosY = (-1*yRange)*(x - 20) * (x + 20) + o->oHomeY;
+    o->oPosY = (-1*o->oThwimpYRange)*(x - 20) * (x + 20) + o->oHomeY;
 
     if (o->oThwompRandomTimer == 0){ //randomly rotates 1 in 5 times
         if (o->oTimer >= 2 && o->oTimer <= 25) {
-            if (cycle == 1)
+            if (o->oThwimpCycle == 1)
             o->oFaceAngleRoll -= DEGREES(15);
-            if (cycle == 2)
+            if (o->oThwimpCycle == 2)
             o->oFaceAngleRoll += DEGREES(15);
         }
     }
@@ -122,8 +165,13 @@ void thwimp_act_jump(void) {
          o->oAction = THWIMP_ACT_ON_GROUND;
     }
     else {
-        if (cycle == 1) o->oPosX+=xRange;
-    else o->oPosX-=xRange;
+        if (o->oThwimpType == X_AXIS_THWIMP){
+            if (o->oThwimpCycle == 1) o->oPosX+=o->oThwimpXRange;
+            else o->oPosX-=o->oThwimpXRange;
+         } else if (o->oThwimpType == Z_AXIS_THWIMP) {
+            if (o->oThwimpCycle == 1) o->oPosZ+=o->oThwimpXRange;
+            else o->oPosZ-=o->oThwimpXRange;
+         }
     }
 
 }
@@ -137,17 +185,5 @@ void bhv_thwimp_loop(void) {
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         o->oInteractStatus = 0;
     }
-   // if (cooldown > 0){
-   //     cur_obj_become_intangible();
-   //     cooldown++;
-   //     
-   //  if (cooldown <= 5) { 
-   //     cooldown = 0;
-   //     cur_obj_become_tangible();
-   //     o->oInteractStatus = 0;
-   // }
-   // }
-   // else obj_set_hitbox(o, &sThwimpHitbox);
-
     cur_obj_call_action_function(sThwimpActions);
 }

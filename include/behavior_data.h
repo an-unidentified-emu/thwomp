@@ -75,6 +75,7 @@ extern const BehaviorScript bhvDoor[];
 extern const BehaviorScript bhvGrindel[];
 extern const BehaviorScript bhvThwomp2[];
 extern const BehaviorScript bhvThwomp[];
+extern const BehaviorScript bhvSidewaysThwomp[];
 extern const BehaviorScript bhvThwimp[];
 extern const BehaviorScript bhvTumblingBridgePlatform[];
 extern const BehaviorScript bhvWfTumblingBridge[];

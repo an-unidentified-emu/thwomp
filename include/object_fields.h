@@ -1037,6 +1037,12 @@
 
 /* Thwomp */
 #define /*0x0F4*/ oThwompRandomTimer OBJECT_FIELD_S32(0x1B)
+#define oThwimpCycle OBJECT_FIELD_U32(0x1C)
+#define oThwimpXRange OBJECT_FIELD_S32(0x1D)
+#define oThwimpYRange OBJECT_FIELD_S32(0x1E)
+#define oThwimpType OBJECT_FIELD_S32(0x1F)
+
+
 
 /* Tilting Platform */
 #define /*0x0F4*/ O_TILTING_PYRAMID_NORMAL_INDEX   0x1B
