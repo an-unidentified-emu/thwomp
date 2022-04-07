@@ -65,32 +65,78 @@ void bhv_grindel_thwomp_loop(void) {
 Generates 2 raycast boxes, the bigger one for the peeking
 and the smaller for activation
 */
-// ro = ray origin
-// rd = ray direction
-/*s32 boxIntersection(Vec3f orig, Vec3f dir, Vec3f boxSize) 
-{
-    Vec3f m = dir; // can precompute if traversing a set of aligned boxes
-    Vec3f n = m*orig;   // can precompute if traversing a set of aligned boxes
-    Vec3f k = abs(m)*boxSize;
-    Vec3f t1 = -n - k;
-    Vec3f t2 = -n + k;
-    //f32 tN = max( max( t1.x, t1.y ), t1.z );
-    //f32 tF = min( min( t2.x, t2.y ), t2.z );
-    if (gMarioObject->oPosX + gMarioObject->radius < t1.x &&
-        gMarioObject->oPosZ + gMarioObject->radius < t1.z &&
-        gMarioObject->oPosY + gMarioObject->radius < t1.y )
-        return TRUE;
-    else return FALSE;
-}*/
+UNUSED bhv_sideways_thwomp_init(void){
+    Vec3f orig = {o->oPosX, o->oPosY, o->oPosZ};
+    Vec3f dir = {0,0,0};
+    Vec3f hit_pos[2];
+    struct Surface *wall;
 
-void bhv_sideways_thwomp_loop(void) {
-    if (gMarioObject->oPosX >= o->oPosX - 1000 &&
+    find_surface_on_ray(orig, dir, &wall, hit_pos, RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
+    //if (hit_pos != NULL){
+    o->oPosX = (s32)hit_pos[0];
+    //o->oHomeX = o->oPosX;
+    //}
+}
+
+#define SIDEWAYS_THWOMP_WAIT 0
+#define SIDEWAYS_THWOMP_ATTACK 1
+#define SIDEWAYS_THWOMP_AT_END 2
+#define SIDEWAYS_THWOMP_RETURN 3
+void sideways_thwomp_wait(void) {
+    if (gMarioObject->oPosX >= o->oPosX - 1000 && // activates the peeking face
+        gMarioObject->oPosX <= o->oPosX - 100  &&
+        gMarioObject->oPosZ <= o->oPosZ + 400  &&
+        gMarioObject->oPosZ >= o->oPosZ - 400  &&
+        gMarioObject->oPosY <= o->oPosY + 500  &&
+        gMarioObject->oPosY >= o->oPosY - 400 ) {
+
+        
+    if (gMarioObject->oPosX >= o->oPosX - 1000 && // activates the movement
         gMarioObject->oPosX <= o->oPosX - 100  &&
         gMarioObject->oPosZ <= o->oPosZ + 200  &&
         gMarioObject->oPosZ >= o->oPosZ - 200  &&
         gMarioObject->oPosY <= o->oPosY + 500  &&
-        gMarioObject->oPosY >= o->oPosY - 200 )
-        print_text(0,0, "WORKS");
+        gMarioObject->oPosY >= o->oPosY - 200 ) {
+        o->oAction = SIDEWAYS_THWOMP_ATTACK;
+        o->oTimer = 0; }
+        }
+}
+
+void sideways_thwomp_attack(void) {
+    o->oVelX += -50.0f;
+    o->oPosX += o->oVelX;
+    if (o->oTimer > 50) {
+        o->oVelX = 0.0f;
+        o->oTimer = 0;
+        o->oAction = SIDEWAYS_THWOMP_AT_END;
+    }
+}
+
+void sideways_thwomp_at_end(void){
+    if (o->oTimer > 20)
+    o->oAction = SIDEWAYS_THWOMP_RETURN;
+}
+void sideways_thwomp_return(void){
+    if (o->oPosX >= o->oHomeX) {
+        o->oPosX = o->oHomeX;
+        o->oAction = SIDEWAYS_THWOMP_WAIT;
+    } else 
+    o->oPosX += 5.0f;
+    
+}
+
+ObjActionFunc sSidewaysThwompActions[] = {
+    sideways_thwomp_wait,
+    sideways_thwomp_attack,
+    sideways_thwomp_at_end,
+    sideways_thwomp_return
+};
+
+void bhv_sideways_thwomp_loop(void) {
+    cur_obj_update_floor_and_walls();
+    print_text_fmt_int(0,0, "%d", o->oAction);
+    cur_obj_move_standard(78);
+    cur_obj_call_action_function(sSidewaysThwompActions);
 }
 
 

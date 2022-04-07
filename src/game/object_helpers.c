@@ -1960,6 +1960,13 @@ void cur_obj_if_hit_wall_bounce_away(void) {
     }
 }
 
+s32 cur_obj_hit_wall(void) {
+    if (o->oMoveFlags & OBJ_MOVE_HIT_WALL)
+    return TRUE;
+    else 
+    return FALSE;
+}
+
 s32 cur_obj_hide_if_mario_far_away_y(f32 distY) {
     if (absf(o->oPosY - gMarioObject->oPosY) < distY) {
         cur_obj_unhide();

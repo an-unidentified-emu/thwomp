@@ -27,7 +27,7 @@ extern Vtx wf_dl_Cylinder_001_mesh_layer_1_vtx_0[40];
 extern Gfx wf_dl_Cylinder_001_mesh_layer_1_tri_0[];
 extern Vtx wf_dl_Cylinder_001_mesh_layer_1_vtx_1[12];
 extern Gfx wf_dl_Cylinder_001_mesh_layer_1_tri_1[];
-extern Vtx wf_dl_leftSide_mesh_layer_1_vtx_0[226];
+extern Vtx wf_dl_leftSide_mesh_layer_1_vtx_0[232];
 extern Gfx wf_dl_leftSide_mesh_layer_1_tri_0[];
 extern Vtx wf_dl_rightSide_mesh_layer_1_vtx_0[322];
 extern Gfx wf_dl_rightSide_mesh_layer_1_tri_0[];
