@@ -103,13 +103,14 @@ void sideways_thwomp_wait(void) {
 }
 
 void sideways_thwomp_attack(void) {
-    o->oVelX += -50.0f;
-    o->oPosX += o->oVelX;
     if (o->oTimer > 50) {
         o->oVelX = 0.0f;
         o->oTimer = 0;
         o->oAction = SIDEWAYS_THWOMP_AT_END;
     }
+    o->oVelX += -50.0f;
+    o->oPosX += o->oVelX;
+ 
 }
 
 void sideways_thwomp_at_end(void){

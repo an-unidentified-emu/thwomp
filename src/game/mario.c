@@ -995,9 +995,8 @@ s32 set_jump_from_landing(struct MarioState *m) {
                 case ACT_DOUBLE_JUMP_LAND:
                     // If Mario has a wing cap, he ignores the typical speed
                     // requirement for a triple jump.
-                    if (m->flags & MARIO_WING_CAP) {
-                        set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-                    } else if (m->forwardVel > 20.0f) {
+        
+                    if (m->forwardVel > 20.0f) {
                         set_mario_action(m, ACT_TRIPLE_JUMP, 0);
                     } else {
                         set_mario_action(m, ACT_JUMP, 0);

@@ -4,7 +4,6 @@ const GeoLayout wf_area_1_geo[] = {
 	GEO_NODE_START(),
 	GEO_OPEN_NODE(),
 		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, 837, -82, -1223, wf_dl_bigThwomp_mesh_layer_1),
-		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, -1199, 1936, 2480, wf_dl_Cube_mesh_layer_1),
 		GEO_TRANSLATE_ROTATE_WITH_DL(LAYER_TRANSPARENT, 2045, 3642, 2399, 0, 0, 50, wf_dl_Cylinder_001_mesh_layer_5),
 		GEO_OPEN_NODE(),
 			GEO_DISPLAY_LIST(LAYER_OPAQUE, wf_dl_Cylinder_001_mesh_layer_1),
