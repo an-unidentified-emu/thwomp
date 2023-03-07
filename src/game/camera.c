@@ -1772,7 +1772,10 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     }
 
     approach_s16_asymptotic_bool(&yaw, marioYaw + goalYawOff, yawSpeed);
-    camera_approach_s16_symmetric_bool(&pitch, goalPitch, pitchInc);
+    if(goalPitch > DEGREES(89))camera_approach_s16_symmetric_bool(&pitch, DEGREES(89), pitchInc);
+    else if(goalPitch < DEGREES(-89))camera_approach_s16_symmetric_bool(&pitch, DEGREES(-89), pitchInc);
+    else camera_approach_s16_symmetric_bool(&pitch, goalPitch, pitchInc);
+    
     if (dist < 300.f) {
         dist = 300.f;
     }

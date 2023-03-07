@@ -351,11 +351,11 @@ void update_flying(struct MarioState *m) {
 
     m->faceAngle[0] += m->angleVel[0];
 
-    if (m->faceAngle[0] > DEGREES(60)) {
-        m->faceAngle[0] = DEGREES(60);
+    if (m->faceAngle[0] > DEGREES(110)) {
+       m->faceAngle[0] = DEGREES(110);
     }
-    if (m->faceAngle[0] < -DEGREES(60)) {
-        m->faceAngle[0] = -DEGREES(60);
+    if (m->faceAngle[0] < -DEGREES(90)) {
+        m->faceAngle[0] = -DEGREES(90);
     }
 
     m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
@@ -1902,7 +1902,7 @@ s32 act_flying_triple_jump(struct MarioState *m) {
             return set_mario_action(m, ACT_MIDAIR_REDSTAR_TURN, 0);
         }
         } else {
-           // return set_mario_action(m, ACT_GROUND_POUND, 0);
+            return set_mario_action(m, ACT_FREEFALL, 0);
         }
     }/*
 
@@ -1921,18 +1921,20 @@ s32 act_flying_triple_jump(struct MarioState *m) {
 #endif
             m->actionState = ACT_STATE_FLYING_TRIPLE_JUMP_SPIN;
 
+    m->faceAngle[1] -= m->controller->stickX*15;
+
+    m->faceAngle[0] -= m->controller->stickY*15;
     if (m->actionState == ACT_STATE_FLYING_TRIPLE_JUMP_SPIN && m->marioObj->header.gfx.animInfo.animFrame == 1) {
         play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
     }
-
-    if (m->vel[1] < 4.0f) {
+    if (is_anim_at_end(m)) {
         if (m->area->camera->mode != FLYING_CAMERA_MODE) {
             set_camera_mode(m->area->camera, FLYING_CAMERA_MODE, 1);
         }
 
-        if (m->forwardVel < 32.0f) {
-            mario_set_forward_vel(m, 32.0f);
-        }
+       // if (m->forwardVel < 32.0f) {
+       //     mario_set_forward_vel(m, 32.0f);
+       // }
 
         set_mario_action(m, ACT_FLYING, 1);
     }
@@ -1963,43 +1965,20 @@ s32 act_flying_triple_jump(struct MarioState *m) {
 }
 
 s32 act_midair_redstar_turn(struct MarioState *m){
-    if(m->input & INPUT_A_PRESSED){
+    if(m->input & INPUT_A_DOWN){
         //set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
+    
 
-    /*s16 targetYawVel = -(s16)(m->controller->stickX*10.0f);
-    if (targetYawVel > 0) {
-        if (m->angleVel[1] < 0) {
-            m->angleVel[1] += 0x40;
-            if (m->angleVel[1] > 0x10) {
-                m->angleVel[1] = 0x10;
-            }
-        } else {
-            m->angleVel[1] = approach_s32(m->angleVel[1], targetYawVel, 0x40, 0x40);
-        }
-    } else if (targetYawVel < 0) {
-        if (m->angleVel[1] > 0) {
-            m->angleVel[1] -= 0x40;
-            if (m->angleVel[1] < -0x10) {
-                m->angleVel[1] = -0x10;
-            }
-        } else {
-            m->angleVel[1] = approach_s32(m->angleVel[1], targetYawVel, 0x40, 0x40);
-        }
-    } 
+    m->faceAngle[1] -= m->controller->stickX*8;
 
-    m->faceAngle[1] += m->angleVel[1];
-    m->faceAngle[2] = 20 * -m->angleVel[1];*/
-    m->faceAngle[1] -= m->controller->stickX*5;
-
-    m->faceAngle[0] -= m->controller->stickY*5;
+    m->faceAngle[0] -= m->controller->stickY*8;
     
     s16 targetPitchVel = -(s16)(m->controller->stickY*2.0f);
 
 
-    if (m->faceAngle[0] > DEGREES(100)) m->faceAngle[0] = DEGREES(100);
-    if (m->faceAngle[0] < DEGREES(-100)) m->faceAngle[0] = DEGREES(-100);
-    if (m->controller->stickY == 0.0f) m->faceAngle[0] = approach_s32(m->faceAngle[0], DEGREES(30), 0x40, 0x40);
+    if (m->faceAngle[0] > DEGREES(110)) m->faceAngle[0] = DEGREES(110);
+    if (m->faceAngle[0] < DEGREES(-90)) m->faceAngle[0] = DEGREES(-90);
+    if (m->controller->stickY == 0.0f) m->faceAngle[0] = approach_s32(m->faceAngle[0], DEGREES(30), 0xDF, 0xDF);
 
         switch (perform_air_step(m, 0)) {
         case AIR_STEP_NONE:
@@ -2061,6 +2040,7 @@ s32 act_midair_redstar_turn(struct MarioState *m){
             lava_boost_on_wall(m);
             break;
     }
+    } else set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
 return FALSE;
 
 }
