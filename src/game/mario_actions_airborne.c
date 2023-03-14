@@ -111,6 +111,10 @@ s32 check_fall_damage(struct MarioState *m, u32 hardFallAction) {
 
 s32 check_kick_or_dive_in_air(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
+        //super mario galaxy red star flying
+    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
+        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+    }
         return set_mario_action(m, m->forwardVel > 28.0f ? ACT_DIVE : ACT_JUMP_KICK, 0);
     }
     return FALSE;
@@ -373,6 +377,50 @@ void update_flying(struct MarioState *m) {
     }
 }
 
+void update_flying_with_wallbounce(struct MarioState *m) {
+    update_flying_pitch(m);
+    update_flying_yaw(m);
+
+    if (m->forwardVel < 0.0f) {
+        m->forwardVel = 0.0f;
+    }
+
+    if (m->forwardVel > 16.0f) {
+        m->faceAngle[0] += (m->forwardVel - 32.0f) * 6.0f;
+    } else if (m->forwardVel > 4.0f) {
+        m->faceAngle[0] += (m->forwardVel - 32.0f) * 10.0f;
+    } else {
+        m->faceAngle[0] -= 0x400;
+    }
+
+    m->faceAngle[0] += m->angleVel[0];
+
+    if (m->faceAngle[0] > DEGREES(110)) {
+       m->faceAngle[0] = DEGREES(110);
+    }
+    if (m->faceAngle[0] < -DEGREES(90)) {
+        m->faceAngle[0] = -DEGREES(90);
+    }
+
+    m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
+    m->vel[1] = m->forwardVel * sins(m->faceAngle[0]);
+    m->vel[2] = m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]);
+
+    m->slideVelX = m->vel[0];
+    m->slideVelZ = m->vel[2];
+
+    if (m->forwardVel < 45.0f) {
+        mario_set_forward_vel(m, 45.0f);
+    }
+    if (m->forwardVel > 100.0f) {
+        mario_set_forward_vel(m, 100.0f);
+    }
+
+    m->vel[0] = m->slideVelX = m->forwardVel * sins(m->faceAngle[1]);
+    m->vel[2] = m->slideVelZ = m->forwardVel * coss(m->faceAngle[1]);
+}
+
+
 u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, u32 stepArg) {
     u32 stepResult;
 
@@ -465,10 +513,6 @@ s32 act_jump(struct MarioState *m) {
     }
 
     if (m->input & INPUT_Z_PRESSED) {
-        //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -488,10 +532,6 @@ s32 act_double_jump(struct MarioState *m) {
     }
 
     if (m->input & INPUT_Z_PRESSED) {
-         //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -507,14 +547,14 @@ s32 act_triple_jump(struct MarioState *m) {
     }
 
     if (m->input & INPUT_B_PRESSED) {
+        //super mario galaxy red star flying
+    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
+        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+    }
         return set_mario_action(m, ACT_DIVE, 0);
     }
 
     if (m->input & INPUT_Z_PRESSED) {
-         //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -532,10 +572,6 @@ s32 act_triple_jump(struct MarioState *m) {
 
 s32 act_backflip(struct MarioState *m) {
     if (m->input & INPUT_Z_PRESSED) {
-         //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -554,14 +590,14 @@ s32 act_freefall(struct MarioState *m) {
     s32 animation = MARIO_ANIM_GENERAL_FALL;
 
     if (m->input & INPUT_B_PRESSED) {
+        //super mario galaxy red star flying
+    if (m->flags & MARIO_WING_CAP) {
+        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+    }
         return set_mario_action(m, ACT_DIVE, 0);
     }
 
     if (m->input & INPUT_Z_PRESSED) {
-         //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -591,10 +627,6 @@ s32 act_hold_jump(struct MarioState *m) {
     }
 
     if (m->input & INPUT_Z_PRESSED) {
-         //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return drop_and_set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return drop_and_set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -621,10 +653,6 @@ s32 act_hold_freefall(struct MarioState *m) {
     }
 
     if (m->input & INPUT_Z_PRESSED) {
-         //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return drop_and_set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return drop_and_set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -634,16 +662,16 @@ s32 act_hold_freefall(struct MarioState *m) {
 
 s32 act_side_flip(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
+        //super mario galaxy red star flying
+    if (m->flags & MARIO_WING_CAP) {
+        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+    }
         m->marioObj->header.gfx.angle[1] += 0x8000;
         return set_mario_action(m, ACT_DIVE, 0);
     }
 
     if (m->input & INPUT_Z_PRESSED) {
         m->marioObj->header.gfx.angle[1] += 0x8000;
-         //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -662,14 +690,14 @@ s32 act_side_flip(struct MarioState *m) {
 
 s32 act_wall_kick_air(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
+        //super mario galaxy red star flying
+    if (m->flags & MARIO_WING_CAP) {
+        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+    }
         return set_mario_action(m, ACT_DIVE, 0);
     }
 
     if (m->input & INPUT_Z_PRESSED) {
-         //super mario galaxy red star flying
-    if (m->flags & MARIO_WING_CAP && m->action != ACT_FLYING && m->action != ACT_FLYING_TRIPLE_JUMP) {
-        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    }
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -936,6 +964,10 @@ s32 act_hold_water_jump(struct MarioState *m) {
 
 s32 act_steep_jump(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
+        //super mario galaxy red star flying
+    if (m->flags & MARIO_WING_CAP) {
+        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+    }
         return set_mario_action(m, ACT_DIVE, 0);
     }
 
@@ -1747,7 +1779,12 @@ s32 act_flying(struct MarioState *m) {
     }
 
     if (m->input & INPUT_A_PRESSED) {
+        set_custom_mario_animation(m, MARIO_ANIM_WING_CAP_TRANSITION);
         return set_mario_action(m, ACT_MIDAIR_REDSTAR_TURN, 0);
+    }
+    //change
+    if (m->input & INPUT_B_PRESSED) {
+        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
     }
 
     if (!(m->flags & MARIO_WING_CAP)) {
@@ -1766,7 +1803,7 @@ s32 act_flying(struct MarioState *m) {
         if (m->actionArg == ACT_ARG_FLYING_FROM_CANNON) {
             set_mario_animation(m, MARIO_ANIM_FLY_FROM_CANNON);
         } else {
-            set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING_FLIP);
+            set_custom_mario_animation(m, MARIO_ANIM_WING_CAP_SPIN);
             if (m->marioObj->header.gfx.animInfo.animFrame == 1) {
                 play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
             }
@@ -1892,58 +1929,38 @@ s32 act_riding_hoot(struct MarioState *m) {
 }
 
 s32 act_flying_triple_jump(struct MarioState *m) {
+    set_custom_mario_animation(m, MARIO_ANIM_WING_CAP_SPIN);
     if (m->input & (INPUT_B_PRESSED | INPUT_Z_PRESSED | INPUT_A_PRESSED)) {
         if (m->area->camera->mode == FLYING_CAMERA_MODE) {
             set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
         }
-        if (m->input & INPUT_B_PRESSED) {
-            return set_mario_action(m, ACT_DIVE, 0);
+        if (m->input & INPUT_Z_PRESSED) {
+            return set_mario_action(m, ACT_GROUND_POUND, 0);
         if (m->input & INPUT_A_PRESSED) {
+            set_mario_animation(m, 0);
             return set_mario_action(m, ACT_MIDAIR_REDSTAR_TURN, 0);
         }
         } else {
-            return set_mario_action(m, ACT_FREEFALL, 0);
+           // return set_mario_action(m, ACT_GROUND_POUND, 0);
         }
-    }/*
+    }
 
-    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO);
-    if (m->actionState == ACT_STATE_FLYING_TRIPLE_JUMP_START) {
-        set_mario_animation(m, MARIO_ANIM_TRIPLE_JUMP_FLY);
-
-        if (m->marioObj->header.gfx.animInfo.animFrame == 7) {
-            play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
-        }
-
-        if (is_anim_past_end(m)) {*/
-            set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING);
 #if ENABLE_RUMBLE
             queue_rumble_data(8, 80);
 #endif
-            m->actionState = ACT_STATE_FLYING_TRIPLE_JUMP_SPIN;
 
-    m->faceAngle[1] -= m->controller->stickX*15;
-
-    m->faceAngle[0] -= m->controller->stickY*15;
-    if (m->actionState == ACT_STATE_FLYING_TRIPLE_JUMP_SPIN && m->marioObj->header.gfx.animInfo.animFrame == 1) {
-        play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
-    }
     if (is_anim_at_end(m)) {
         if (m->area->camera->mode != FLYING_CAMERA_MODE) {
             set_camera_mode(m->area->camera, FLYING_CAMERA_MODE, 1);
         }
-
-       // if (m->forwardVel < 32.0f) {
-       //     mario_set_forward_vel(m, 32.0f);
-       // }
-
-        set_mario_action(m, ACT_FLYING, 1);
+         return set_mario_action(m, ACT_FLYING, 1);
     }
 
     if (m->actionTimer++ == 10 && m->area->camera->mode != FLYING_CAMERA_MODE) {
         set_camera_mode(m->area->camera, FLYING_CAMERA_MODE, 1);
     }
 
-    update_air_without_turn(m);
+    update_flying_with_wallbounce(m);
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
@@ -1965,28 +1982,33 @@ s32 act_flying_triple_jump(struct MarioState *m) {
 }
 
 s32 act_midair_redstar_turn(struct MarioState *m){
+    if(is_anim_at_end(m)) set_custom_mario_animation(m, MARIO_ANIM_WING_CAP_STALL);
+    if(m->area->camera->mode != DEEP_WATER_CAMERA_MODE)
+        set_camera_mode(m->area->camera, DEEP_WATER_CAMERA_MODE, 1);
+
+    if (!(m->flags & MARIO_WING_CAP)) {
+        if (m->area->camera->mode == FLYING_CAMERA_MODE) {
+            set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+        }
+        return set_mario_action(m, ACT_FREEFALL, 0);
+    }
     if(m->input & INPUT_A_DOWN){
-        //set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    
 
     m->faceAngle[1] -= m->controller->stickX*8;
 
     m->faceAngle[0] -= m->controller->stickY*8;
     
-    s16 targetPitchVel = -(s16)(m->controller->stickY*2.0f);
-
-
     if (m->faceAngle[0] > DEGREES(110)) m->faceAngle[0] = DEGREES(110);
     if (m->faceAngle[0] < DEGREES(-90)) m->faceAngle[0] = DEGREES(-90);
-    if (m->controller->stickY == 0.0f) m->faceAngle[0] = approach_s32(m->faceAngle[0], DEGREES(30), 0xDF, 0xDF);
+    if (m->controller->stickY == 0.0f) m->faceAngle[0] = approach_s32(m->faceAngle[0], DEGREES(30), 0xCF, 0xCF);
 
-        switch (perform_air_step(m, 0)) {
+    switch (perform_air_step(m, 0)) {
         case AIR_STEP_NONE:
             m->forwardVel = approach_f32(m->forwardVel, 0.0f, 2.0f, 2.0f);
             m->vel[0] = approach_f32(m->vel[0], 0.0f, 2.0f, 2.0f);
             m->vel[1] = approach_f32(m->vel[1], 0.0f, 2.0f, 2.0f);
             m->vel[2] = approach_f32(m->vel[2], 0.0f, 2.0f, 2.0f);
-            m->faceAngle[2] = approach_s32(m->faceAngle[2], 0x00, 0x50, 0x50);
+            m->faceAngle[2] = approach_s32(m->faceAngle[2], 0x00, 0x100, 0x100);
             m->marioObj->header.gfx.angle[0] = -m->faceAngle[0];
             m->marioObj->header.gfx.angle[2] = m->faceAngle[2];
             m->actionTimer = 0;
@@ -2040,7 +2062,10 @@ s32 act_midair_redstar_turn(struct MarioState *m){
             lava_boost_on_wall(m);
             break;
     }
-    } else set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+    m->marioObj->oTimer = 0;
+    } else {
+        return set_mario_action(m, ACT_FLYING, 1);
+    }
 return FALSE;
 
 }
@@ -2091,6 +2116,10 @@ s32 act_vertical_wind(struct MarioState *m) {
 
 s32 act_special_triple_jump(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
+        //super mario galaxy red star flying
+    if (m->flags & MARIO_WING_CAP) {
+        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+    }
         return set_mario_action(m, ACT_DIVE, 0);
     }
 
