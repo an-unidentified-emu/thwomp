@@ -135,7 +135,7 @@ ObjActionFunc sSidewaysThwompActions[] = {
 
 void bhv_sideways_thwomp_loop(void) {
     cur_obj_update_floor_and_walls();
-    print_text_fmt_int(0,0, "%d", o->oAction);
+    //print_text_fmt_int(0,0, "%d", o->oAction);
     cur_obj_move_standard(78);
     cur_obj_call_action_function(sSidewaysThwompActions);
 }
@@ -233,4 +233,36 @@ void bhv_thwimp_loop(void) {
         o->oInteractStatus = 0;
     }
     cur_obj_call_action_function(sThwimpActions);
+}
+
+/********************************************
+ *********    NEW THWOMPS   *****************
+ ********************************************
+*/
+void thwomp_act_wait(void) {
+
+}
+
+void thwomp_act_attack(void) {
+
+}
+
+void thwomp_act_at_bottom(void) {
+
+}
+
+void thwomp_act_rise(void) {
+
+}
+
+ObjActionFunc sNewThwompActions[] = {
+    thwomp_act_wait,
+    thwomp_act_attack,
+    thwomp_act_at_bottom,
+    thwomp_act_rise
+
+};
+
+void bhv_new_thwomp_loop(void){
+    cur_obj_call_action_function(sNewThwompActions);
 }

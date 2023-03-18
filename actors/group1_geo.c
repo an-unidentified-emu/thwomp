@@ -15,3 +15,4 @@
 #include "heave_ho/geo.inc.c"
 
 #include "thwimp/geo.inc.c"
+#include "new_thwomp/geo.inc.c"

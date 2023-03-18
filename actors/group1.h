@@ -93,4 +93,8 @@ extern const Gfx yoshi_egg_seg5_dl_050098C8[];
 
 #include "thwimp/geo_header.h"
 
+#include "new_thwomp/geo_header.h"
+
+#include "new_thwomp/collision_header.h"
+
 #endif

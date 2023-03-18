@@ -30,3 +30,5 @@ UNUSED static const u64 binid_4 = 4;
 UNUSED static const u64 binid_5 = 5;
 
 #include "thwimp/model.inc.c"
+#include "new_thwomp/model.inc.c"
+#include "new_thwomp/collision.inc.c"
