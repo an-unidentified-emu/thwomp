@@ -12,10 +12,6 @@
 #include "levels/scripts.h"
 
 #include "actors/common1.h"
-
-/* Fast64 begin persistent block [includes] */
-/* Fast64 end persistent block [includes] */
-
 #include "make_const_nonconst.h"
 #include "levels/wf/header.h"
 
@@ -71,7 +67,6 @@ const LevelScript level_wf_entry[] = {
 	LOAD_MODEL_FROM_GEO(MODEL_WF_KICKABLE_BOARD, wf_geo_000BA8), 
 	LOAD_MODEL_FROM_GEO(MODEL_WF_TOWER_DOOR, wf_geo_000BE0), 
 	LOAD_MODEL_FROM_GEO(MODEL_WF_KICKABLE_BOARD_FELLED, wf_geo_000BC8), 
-
 	/* Fast64 begin persistent block [level commands] */
 
 	/* Fast64 end persistent block [level commands] */
@@ -81,27 +76,40 @@ const LevelScript level_wf_entry[] = {
 		WARP_NODE(0xF1, LEVEL_CASTLE, 0x01, 0x66, WARP_NO_CHECKPOINT),
 		WARP_NODE(0xF0, LEVEL_CASTLE, 0x01, 0x34, WARP_NO_CHECKPOINT),
 		OBJECT(MODEL_NONE, 2780, 1121, -3048, 0, 0, 0, (10 << 16), bhvFlyingWarp),
-		OBJECT(MODEL_NONE, 324, 988, -2646, 0, 0, 0, 0x00000000, bhvHiddenStarTrigger),
-		OBJECT(MODEL_NONE, -402, 988, -2646, 0, 0, 0, 0x00000000, bhvHiddenStarTrigger),
+		OBJECT(MODEL_NEW_THWOMP, 5666, 2025, 450, 0, -90, 0, 0x00000000, bhvNewThwomp),
+		OBJECT(MODEL_NONE, -64, 1871, 2617, 0, 0, 0, (0x3D << 16), bhvPoleGrabbing),
+		OBJECT(MODEL_NONE, 883, 1296, 4077, 0, 0, 0, (0x3D << 16), bhvPoleGrabbing),
+		OBJECT(MODEL_NONE, 883, 1270, 5135, 0, 0, 0, (0x3D << 16), bhvPoleGrabbing),
+		OBJECT(MODEL_NONE, -81, 1783, 5135, 0, 0, 0, (0x3D << 16), bhvPoleGrabbing),
+		OBJECT(MODEL_NONE, -81, 2557, 6185, 0, 0, 0, (0x3D << 16), bhvPoleGrabbing),
+		OBJECT(MODEL_NONE, -81, 2886, 5135, 0, 0, 0, (0x3D << 16), bhvPoleGrabbing),
+		OBJECT(MODEL_NONE, -81, 3548, 6185, 0, 0, 0, (0x3D << 16), bhvPoleGrabbing),
+		OBJECT(MODEL_NONE, 324, 988, -2558, 0, 0, 0, 0x00000000, bhvHiddenStarTrigger),
+		OBJECT(MODEL_NONE, -402, 988, -2558, 0, 0, 0, 0x00000000, bhvHiddenStarTrigger),
 		OBJECT(MODEL_NONE, -2438, 1892, 498, 0, 0, 0, 0x00000000, bhvHiddenStarTrigger),
 		OBJECT(MODEL_NONE, -2438, 2302, 1178, 0, 0, 0, 0x00000000, bhvHiddenStarTrigger),
 		OBJECT(MODEL_NONE, -2438, 2834, 1826, 0, 0, 0, 0x00000000, bhvHiddenStarTrigger),
-		OBJECT(MODEL_THWOMP, -1796, 836, 2757, 0, 0, 0, 0x00000000, bhvThwomp),
-		OBJECT(MODEL_THWOMP, 3258, 1430, -2819, 0, -90, 0, 0x00000000, bhvSidewaysThwomp),
-		OBJECT(MODEL_THWOMP, 4396, 1430, -2819, 0, -90, 0, 0x00000000, bhvSidewaysThwomp),
+		OBJECT(MODEL_NEW_THWOMP, 3258, 1430, -2819, 0, -90, 0, 0x00000000, bhvSidewaysThwomp),
+		OBJECT(MODEL_NEW_THWOMP, 4396, 1430, -2819, 0, -90, 0, 0x00000000, bhvSidewaysThwomp),
+		OBJECT(MODEL_NEW_THWOMP, 3506, 1616, 453, 0, -90, 0, 0x00000000, bhvSidewaysThwomp),
 		OBJECT(MODEL_WF_ROTATING_PLATFORM, -3521, 2072, 2573, 0, 0, 0, (0x08 << 24), bhvRotatingPlatform),
 		OBJECT_WITH_ACTS(MODEL_WF_ROTATING_PLATFORM, 2058, 1589, -1859, 0, 0, 0, (0x08 << 24), bhvRotatingPlatform, ACT_6),
 		OBJECT_WITH_ACTS(MODEL_WF_ROTATING_PLATFORM, 1567, 1786, -2152, 0, 0, 0, (0x08 << 24), bhvRotatingPlatform, ACT_6),
 		OBJECT_WITH_ACTS(MODEL_WF_ROTATING_PLATFORM, 1836, 2130, -1613, 0, 0, 0, (0x08 << 24), bhvRotatingPlatform, ACT_6),
 		OBJECT_WITH_ACTS(MODEL_WF_ROTATING_PLATFORM, 2043, 2434, -681, 0, 0, 0, (0x08 << 24), bhvRotatingPlatform, ACT_6),
-		OBJECT(MODEL_STAR, -49, 4018, 694, 0, 0, 0, 0x00000000, bhvStar),
+		OBJECT(MODEL_WF_ROTATING_PLATFORM, -133, 4235, 5045, 0, 0, 0, (0x08 << 24), bhvRotatingPlatform),
+		OBJECT(MODEL_STAR, 2813, 2998, -2872, 0, 0, 0, (4 << 24), bhvStar),
 		OBJECT(MODEL_NONE, -1909, 1553, 3542, 0, 0, 0, (5 << 24), bhvHiddenStar),
-		OBJECT(MODEL_STAR, 1912, 3660, 2399, 0, 0, 0, (4 << 24), bhvStar),
+		OBJECT(MODEL_STAR, -141, 4690, 5044, 0, 0, 0, 0x00000000, bhvStar),
+		OBJECT(MODEL_STAR, -49, 4018, 694, 0, 0, 0, 0x00000000, bhvStar),
+		OBJECT(MODEL_STAR, 2001, 3660, 2399, 0, 0, 0, (4 << 24), bhvStar),
 		OBJECT(MODEL_THWIMP, 2414, 552, -1753, 0, 0, 0, (0x0A << 16) | (1 << 8), bhvThwimp),
 		OBJECT(MODEL_THWIMP, 2285, 552, -455, 0, 0, 0, (0x01 << 24) | (0x0A << 16) | (01 << 8), bhvThwimp),
 		OBJECT(MODEL_THWIMP, 2414, 552, -615, 0, 0, 0, (0x0A << 16) | (1 << 8), bhvThwimp),
-		OBJECT(MODEL_NEW_THWOMP, 324, 764, -2646, 0, 90, 0, 0x00000000, bhvNewThwomp),
-		OBJECT(MODEL_NEW_THWOMP, -402, 764, -2646, 0, 90, 0, 0x00000000, bhvNewThwomp),
+		OBJECT(MODEL_THWOMP, -1796, 836, 2757, 0, 0, 0, 0x00000000, bhvThwomp),
+		OBJECT(MODEL_NEW_THWOMP, 324, 764, -2558, 0, 90, 0, 0x00000000, bhvNewThwomp),
+		OBJECT(MODEL_THWOMP, 5643, 1610, -2151, 0, 0, 0, 0x00000000, bhvThwomp),
+		OBJECT(MODEL_NEW_THWOMP, -402, 764, -2558, 0, 90, 0, 0x00000000, bhvNewThwomp),
 		OBJECT(MODEL_NEW_THWOMP, -2438, 1667, 498, 0, -180, 0, 0x00000000, bhvNewThwomp),
 		OBJECT(MODEL_NEW_THWOMP, -2438, 2077, 1178, 0, -180, 0, 0x00000000, bhvNewThwomp),
 		OBJECT(MODEL_NEW_THWOMP, -2438, 2610, 1826, 0, -180, 0, 0x00000000, bhvNewThwomp),
@@ -113,7 +121,6 @@ const LevelScript level_wf_entry[] = {
 		/* Fast64 begin persistent block [area commands] */
 		/* Fast64 end persistent block [area commands] */
 	END_AREA(),
-
 	FREE_LEVEL_POOL(),
 	MARIO_POS(1, 0, 0, 0, 0),
 	CALL(0, lvl_init_or_update),
