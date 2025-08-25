@@ -5,6 +5,7 @@ const GeoLayout wf_area_1_geo[] = {
 	GEO_OPEN_NODE(),
 		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, 837, -82, -1223, wf_dl_bigThwomp_mesh_layer_1),
 		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, 524, 1555, 2564, wf_dl_Cube_mesh_layer_1),
+		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, 4955, 1760, 453, wf_dl_Cube_001_mesh_layer_1),
 		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, 3298, 1358, -2867, wf_dl_grassy_path_mesh_layer_1),
 		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, 3298, 2710, -2867, wf_dl_grassy_path_001_mesh_layer_1),
 		GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, 2013, 3683, 2399, wf_dl_owless_mesh_layer_1),

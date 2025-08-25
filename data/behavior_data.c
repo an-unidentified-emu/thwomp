@@ -1194,6 +1194,7 @@ const BehaviorScript bhvSidewaysThwomp[] = {
     SET_HOME(),    
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 250, /*Gravity*/ 0, /*Bounciness*/ 0, /*Drag strength*/ 0, /*Friction*/ 0, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     SET_FLOAT(oDrawingDistance, 4000),
+    CALL_NATIVE(bhv_sideways_thwomp_init),
     BEGIN_LOOP(),
         CALL_NATIVE(cur_obj_update_floor_and_walls),
         CALL_NATIVE(bhv_sideways_thwomp_loop),

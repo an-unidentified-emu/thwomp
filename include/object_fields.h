@@ -1042,6 +1042,7 @@
 #define oThwimpYRange OBJECT_FIELD_S32(0x1E)
 #define oThwimpType OBJECT_FIELD_S32(0x1F)
 
+#define /*0x0F4*/ oFlipDirection     OBJECT_FIELD_F32(0x1B)
 
 
 /* Tilting Platform */
