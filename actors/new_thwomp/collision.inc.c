@@ -25,7 +25,7 @@ const Collision new_thwomp_collision[] = {
 	COL_VERTEX(-96, 0, 107),
 	COL_VERTEX(-96, 360, -98),
 	COL_VERTEX(-96, 0, -98),
-	COL_TRI_INIT(SURFACE_NOT_SLIPPERY, 44),
+	COL_TRI_INIT(SURFACE_HARD_NOT_SLIPPERY, 44),
 	COL_TRI(0, 1, 2),
 	COL_TRI(0, 2, 3),
 	COL_TRI(4, 5, 6),

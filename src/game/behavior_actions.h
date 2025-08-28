@@ -24,6 +24,8 @@ void bhv_thwimp_init(void);
 void bhv_thwimp_loop(void);
 void bhv_sideways_thwomp_init(void);
 void bhv_sideways_thwomp_loop(void);
+void bhv_new_thwomp_init(void);
+void bhv_new_thwomp_loop(void);
 void bhv_door_init(void);
 void bhv_door_loop(void);
 void bhv_star_door_loop(void);
@@ -561,6 +563,7 @@ Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s3
 Gfx *geo_update_body_rot_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx);
 Gfx *geo_switch_bowser_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
 
+Gfx *geo_new_thwomp_eyes(s32 callContext, struct GraphNode *node);
 // Tuxie
 Gfx *geo_switch_tuxie_mother_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
 

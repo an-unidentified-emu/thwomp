@@ -33,3 +33,4 @@
 
 #include "mario/anims/data.inc.c"
 #include "mario/anims/table.inc.c"
+#include "new_thwomp/model.inc.c"

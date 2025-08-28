@@ -59,27 +59,136 @@ void bhv_grindel_thwomp_loop(void) {
     cur_obj_call_action_function(sGrindelThwompActions);
 }
 
+
+/********************************************
+ *********    NEW THWOMPS   *****************
+ ********************************************
+*/
+// For animations
+#define THWOMP_FACE_NORMAL  0
+#define THWOMP_FACE_CLOSED  1
+#define THWOMP_FACE_PEEKING 2
+#define THWOMP_WAIT 0
+#define THWOMP_ATTACK 1
+#define THWOMP_AT_BOTTOM 2
+#define THWOMP_RISE 3
+
+void bhv_new_thwomp_init(void) {
+    o->oFlipDirection = -1;
+    if (GET_BPARAM1(o->oBehParams) == 0x01) { //flip attack direction
+        o->oFlipDirection = 1;
+    }
+
+    Vec3f orig = { o->oPosX, o->oPosY, o->oPosZ };
+    Vec3f dir  = { 0.0f, 3000.0f*o->oFlipDirection, 0.0f}; // cast a ray 3000 units along -Y
+    struct Surface *hit_surface;
+    Vec3f hit_pos;
+    
+    find_surface_on_ray(orig, dir, &hit_surface, hit_pos, RAYCAST_FIND_FLOOR);
+    o->oThwompFaceState = THWOMP_FACE_CLOSED;
+    o->oHitPosX = hit_pos[0];
+    o->oHitPosY = hit_pos[1];
+    o->oHitPosZ = hit_pos[2];
+}
+void thwomp_act_wait(void) {
+    if (o->oTimer > 30) {
+        // Relative Y distance (signed)
+        f32 dy = (gMarioObject->oPosY - o->oPosY) * o->oFlipDirection;
+
+    // --- Peeking face activation ---
+        if (dy >= 100 && dy <= 1000 &&   // Mario is 100–1000 units in front
+            gMarioObject->oPosX <= o->oPosX + 400 &&
+            gMarioObject->oPosX >= o->oPosX - 400 &&
+            gMarioObject->oPosZ <= o->oPosZ + 500 &&
+            gMarioObject->oPosZ >= o->oPosZ - 400) {
+
+            // --- Movement activation ---
+            if (dy >= 100 && dy <= 1000 &&   // same Y window but tighter X range
+                gMarioObject->oPosX <= o->oPosX + 200 &&
+                gMarioObject->oPosX >= o->oPosX - 200 &&
+                gMarioObject->oPosZ <= o->oPosZ + 500 &&
+                gMarioObject->oPosZ >= o->oPosZ - 200) {
+
+                o->oAction = THWOMP_ATTACK;
+                o->oTimer = 0;
+            }
+        }
+
+        o->oThwompFaceState = THWOMP_FACE_CLOSED;
+}
+}
+
+void thwomp_act_attack(void) {
+// Target stop position: 255 units away from the wall, depending on direction
+    f32 targetY = o->oHitPosY - 1.0f * o->oFlipDirection;
+
+    // Check if we've reached/passed the target in the direction we're moving
+    if ((o->oPosY - targetY) * o->oFlipDirection >= 0.0f) {
+        o->oVelY = 0.0f;
+        o->oTimer = 0;
+        o->oPosY = targetY;
+        o->oAction = THWOMP_AT_BOTTOM;
+        if (o->oTimer == 0 && o->oDistanceToMario < 1500.0f) {
+            cur_obj_shake_screen(SHAKE_POS_SMALL);
+            cur_obj_play_sound_2(SOUND_OBJ_THWOMP);
+        }
+    }
+
+    o->oVelY += 10.0f * o->oFlipDirection;
+    if (o->oVelZ > 75.0f) o->oVelZ = 75.0f;
+    o->oPosY += o->oVelY;
+}
+
+void thwomp_act_at_bottom(void) {
+    if (o->oTimer > 30)
+    o->oAction = THWOMP_RISE;
+}
+
+void thwomp_act_rise(void) {
+if (o->oPosY * -o->oFlipDirection >= o->oHomeY) {
+        o->oTimer = 0;
+        o->oAction = THWOMP_WAIT;
+    } else
+    o->oPosY -= 10.0f * o->oFlipDirection;
+}
+
+ObjActionFunc sNewThwompActions[] = {
+    thwomp_act_wait,
+    thwomp_act_attack,
+    thwomp_act_at_bottom,
+    thwomp_act_rise
+
+};
+
+void bhv_new_thwomp_loop(void){
+    cur_obj_call_action_function(sNewThwompActions);
+    o->oThwompFaceState = THWOMP_FACE_CLOSED;
+}
+
+
 /********************************************
 ***********     SIDEWAYS THWOMPS ************
 *********************************************
 Generates 2 raycast boxes, the bigger one for the peeking
 and the smaller for activation
 */
+
 void bhv_sideways_thwomp_init(void){
-    //Vec3f orig = {o->oPosX, o->oPosY, o->oPosZ};
-    //Vec3f dir = {0,0,0};
-    //Vec3f hit_pos[2];
-    //struct Surface *wall;
-     o->oFlipDirection = 1;
+    o->oFlipDirection = 1;
     if (GET_BPARAM1(o->oBehParams) == 0x01) { //flip attack direction
         o->oFlipDirection = -1;
     }
 
-    //find_surface_on_ray(orig, dir, &wall, hit_pos, RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
-    //if (hit_pos != NULL){
-    //o->oPosZ = (s32)hit_pos[0];
-    //o->oHomeX = o->oPosX;
-    //}
+    Vec3f orig = { o->oPosX, o->oPosY, o->oPosZ };
+    Vec3f dir  = { 0.0f, 0.0f, 3000.0f*o->oFlipDirection }; // cast a ray 3000 units along +Z
+    struct Surface *hit_surface;
+    Vec3f hit_pos;
+    
+    find_surface_on_ray(orig, dir, &hit_surface, hit_pos, RAYCAST_FIND_WALL);
+    o->oThwompFaceState = THWOMP_FACE_CLOSED;
+    o->oHitPosX = hit_pos[0];
+    o->oHitPosY = hit_pos[1];
+    o->oHitPosZ = hit_pos[2];
 }
 
 #define SIDEWAYS_THWOMP_WAIT 0
@@ -87,34 +196,47 @@ void bhv_sideways_thwomp_init(void){
 #define SIDEWAYS_THWOMP_AT_END 2
 #define SIDEWAYS_THWOMP_RETURN 3
 void sideways_thwomp_wait(void) {
-    if (gMarioObject->oPosZ >= o->oPosZ - 1000 && // activates the peeking face
-        gMarioObject->oPosZ <= o->oPosZ - 100  &&
-        gMarioObject->oPosX <= o->oPosX + 400  &&
-        gMarioObject->oPosX >= o->oPosX - 400  &&
-        gMarioObject->oPosY <= o->oPosY + 500  &&
-        gMarioObject->oPosY >= o->oPosY - 400 ) {
+    // Relative Z distance (signed)
+    f32 dz = (gMarioObject->oPosZ - o->oPosZ) * o->oFlipDirection;
 
-        
-    if (gMarioObject->oPosZ >= o->oPosZ - 1000 && // activates the movement
-        gMarioObject->oPosZ <= o->oPosZ - 100  &&
-        gMarioObject->oPosX <= o->oPosX + 200  &&
-        gMarioObject->oPosX >= o->oPosX - 200  &&
-        gMarioObject->oPosY <= o->oPosY + 500  &&
-        gMarioObject->oPosY >= o->oPosY - 200 ) {
-        o->oAction = SIDEWAYS_THWOMP_ATTACK;
-        o->oTimer = 0; }
+    // --- Peeking face activation ---
+    if (dz >= 100 && dz <= 1000 &&   // Mario is 100–1000 units in front
+        gMarioObject->oPosX <= o->oPosX + 400 &&
+        gMarioObject->oPosX >= o->oPosX - 400 &&
+        gMarioObject->oPosY <= o->oPosY + 500 &&
+        gMarioObject->oPosY >= o->oPosY - 400) {
+
+        // --- Movement activation ---
+        if (dz >= 100 && dz <= 1000 &&   // same Z window but tighter X range
+            gMarioObject->oPosX <= o->oPosX + 200 &&
+            gMarioObject->oPosX >= o->oPosX - 200 &&
+            gMarioObject->oPosY <= o->oPosY + 500 &&
+            gMarioObject->oPosY >= o->oPosY - 200) {
+
+            o->oAction = SIDEWAYS_THWOMP_ATTACK;
+            o->oTimer = 0;
         }
+    }
+
+    o->oThwompFaceState = THWOMP_FACE_CLOSED;
 }
 
+
 void sideways_thwomp_attack(void) {
-    if (o->oTimer > 50) {
+    // Target stop position: 255 units away from the wall, depending on direction
+    f32 targetZ = o->oHitPosZ - 255.0f * o->oFlipDirection;
+
+    // Check if we've reached/passed the target in the direction we're moving
+    if ((o->oPosZ - targetZ) * o->oFlipDirection >= 0.0f) {
         o->oVelZ = 0.0f;
         o->oTimer = 0;
+        o->oPosZ = targetZ;
         o->oAction = SIDEWAYS_THWOMP_AT_END;
     }
-    o->oVelZ += 50.0f * o->oFlipDirection;
-    o->oPosZ += o->oVelZ;
 
+    o->oVelZ += 10.0f * o->oFlipDirection;
+    if (o->oVelZ > 75.0f) o->oVelZ = 75.0f;
+    o->oPosZ += o->oVelZ;
 }
 
 void sideways_thwomp_at_end(void){
@@ -126,7 +248,7 @@ void sideways_thwomp_return(void){
         //o->oPosZ = o->oHomeZ;
         o->oAction = SIDEWAYS_THWOMP_WAIT;
     } else
-    o->oPosZ -= 5.0f * o->oFlipDirection;
+    o->oPosZ -= 10.0f * o->oFlipDirection;
 
 }
 
@@ -138,10 +260,8 @@ ObjActionFunc sSidewaysThwompActions[] = {
 };
 
 void bhv_sideways_thwomp_loop(void) {
-    cur_obj_update_floor_and_walls();
-    //print_text_fmt_int(0,0, "%d", o->oAction);
-    cur_obj_move_standard(78);
     cur_obj_call_action_function(sSidewaysThwompActions);
+    o->oThwompFaceState = THWOMP_FACE_CLOSED;
 }
 
 
@@ -239,34 +359,65 @@ void bhv_thwimp_loop(void) {
     cur_obj_call_action_function(sThwimpActions);
 }
 
-/********************************************
- *********    NEW THWOMPS   *****************
- ********************************************
+/*Gfx *geo_new_thwomp_eyes(s32 callContext, struct GraphNode *node) {
+    if (callContext != GEO_CONTEXT_RENDER) {
+        return NULL;
+    }
+
+    struct Object *obj = (struct Object *)gCurGraphNodeObject; 
+    if (obj == NULL) {
+        return NULL;
+    }
+
+    // Give plenty of space (safe upper bound ~20 commands)
+    Gfx *dl = alloc_display_list(20 * sizeof(Gfx));
+    Gfx *head = dl;
+
+    // --- Material setup (copied from your mat_new_thwomp_face) ---
+    gSPTexture(head++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
+    gDPSetCombineLERP(head++,
+        TEXEL0, 0, SHADE, 0,   0, 0, 0, ENVIRONMENT,
+        TEXEL0, 0, SHADE, 0,   0, 0, 0, ENVIRONMENT);
+    gDPSetTextureFilter(head++, G_TF_BILERP);
+    gDPSetRenderMode(head++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
+
+    // Tell RDP we're using a palette
+    gDPSetTextureLUT(head++, G_TT_RGBA16);
+    o->oThwompFaceState = 1;
+    switch (o->oThwompFaceState) {
+        case 0: // open eyes
+            gDPLoadTLUT_pal16(head++, 0, new_thwomp_thwomp_face_grey_rgba16_pal_rgba16);
+            gDPLoadTextureBlock(head++, new_thwomp_thwomp_face_grey_rgba16_ci8,
+                G_IM_FMT_CI, G_IM_SIZ_8b,
+                32, 32, 0,
+                G_TX_WRAP, G_TX_WRAP,
+                5, 5,
+                G_TX_NOLOD, G_TX_NOLOD);
+            break;
+
+        case 1: // closed eyes
+            gDPLoadTLUT_pal16(head++, 0, new_thwomp_thwomp_face_grey_closed_eyes_rgba16_pal_rgba16);
+            gDPLoadTextureBlock(head++, new_thwomp_thwomp_face_grey_closed_eyes_rgba16_ci8,
+                G_IM_FMT_CI, G_IM_SIZ_8b,
+                32, 32, 0,
+                G_TX_WRAP, G_TX_WRAP,
+                5, 5,
+                G_TX_NOLOD, G_TX_NOLOD);
+            break;
+
+        case 2: // peeking
+            gDPLoadTLUT_pal16(head++, 0, new_thwomp_thwomp_face_grey_peek_rgba16_pal_rgba16);
+            gDPLoadTextureBlock(head++, new_thwomp_thwomp_face_grey_peek_rgba16_ci8,
+                G_IM_FMT_CI, G_IM_SIZ_8b,
+                32, 32, 0,
+                G_TX_WRAP, G_TX_WRAP,
+                5, 5,
+                G_TX_NOLOD, G_TX_NOLOD);
+            break;
+    }
+
+    gSPEndDisplayList(head);
+    print_text_fmt_int(0,0,"%d", o->oThwompFaceState);
+    return dl;
+}
 */
-void thwomp_act_wait(void) {
-
-}
-
-void thwomp_act_attack(void) {
-
-}
-
-void thwomp_act_at_bottom(void) {
-
-}
-
-void thwomp_act_rise(void) {
-
-}
-
-ObjActionFunc sNewThwompActions[] = {
-    thwomp_act_wait,
-    thwomp_act_attack,
-    thwomp_act_at_bottom,
-    thwomp_act_rise
-
-};
-
-void bhv_new_thwomp_loop(void){
-    cur_obj_call_action_function(sNewThwompActions);
-}

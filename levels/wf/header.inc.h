@@ -71,7 +71,7 @@ extern Gfx wf_dl_wate_mesh_layer_1_tri_4[];
 extern Vtx wf_dl_wate_mesh_layer_1_vtx_5[74];
 extern Gfx wf_dl_wate_mesh_layer_1_tri_5[];
 extern Vtx wf_dl_wate_001_mesh_layer_1_vtx_cull[8];
-extern Vtx wf_dl_wate_001_mesh_layer_1_vtx_0[18];
+extern Vtx wf_dl_wate_001_mesh_layer_1_vtx_0[54];
 extern Gfx wf_dl_wate_001_mesh_layer_1_tri_0[];
 extern Vtx wf_dl_wate_001_mesh_layer_1_vtx_1[106];
 extern Gfx wf_dl_wate_001_mesh_layer_1_tri_1[];

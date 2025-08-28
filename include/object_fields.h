@@ -1043,7 +1043,16 @@
 #define oThwimpType OBJECT_FIELD_S32(0x1F)
 
 #define /*0x0F4*/ oFlipDirection     OBJECT_FIELD_F32(0x1B)
-
+#define oThwompFaceState OBJECT_FIELD_S32(0x1C)
+//#define /*0x108*/ oOrigX OBJECT_FIELD_F32(0x20)
+//#define /*0x10C*/ oOrigY OBJECT_FIELD_F32(0x21)
+//#define /*0x110*/ oOrigZ OBJECT_FIELD_F32(0x22)
+//#define oDirX OBJECT_FIELD_F32(0x23)
+//#define oDirY OBJECT_FIELD_F32(0x24)
+//#define oDirZ OBJECT_FIELD_F32(0x25)
+#define oHitPosX OBJECT_FIELD_F32(0x20)
+#define oHitPosY OBJECT_FIELD_F32(0x21)
+#define oHitPosZ OBJECT_FIELD_F32(0x22)
 
 /* Tilting Platform */
 #define /*0x0F4*/ O_TILTING_PYRAMID_NORMAL_INDEX   0x1B
