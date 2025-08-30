@@ -120,7 +120,7 @@ void thwomp_act_wait(void) {
 
 void thwomp_act_attack(void) {
 // Target stop position: 255 units away from the wall, depending on direction
-    f32 targetY = o->oHitPosY - 1.0f * o->oFlipDirection;
+    f32 targetY = o->oHitPosY-10.0f;// * o->oFlipDirection;
 
     // Check if we've reached/passed the target in the direction we're moving
     if ((o->oPosY - targetY) * o->oFlipDirection >= 0.0f) {
@@ -223,8 +223,8 @@ void sideways_thwomp_wait(void) {
 
 
 void sideways_thwomp_attack(void) {
-    // Target stop position: 255 units away from the wall, depending on direction
-    f32 targetZ = o->oHitPosZ - 255.0f * o->oFlipDirection;
+    // Target stop position: 200 units away from the wall, depending on direction
+    f32 targetZ = o->oHitPosZ - 200.0f * o->oFlipDirection;
 
     // Check if we've reached/passed the target in the direction we're moving
     if ((o->oPosZ - targetZ) * o->oFlipDirection >= 0.0f) {
@@ -235,7 +235,7 @@ void sideways_thwomp_attack(void) {
     }
 
     o->oVelZ += 10.0f * o->oFlipDirection;
-    if (o->oVelZ > 75.0f) o->oVelZ = 75.0f;
+    if ((o->oVelZ - 75.0f) * o->oFlipDirection > 0.0f) o->oVelZ = 75.0f*o->oFlipDirection;
     o->oPosZ += o->oVelZ;
 }
 
@@ -244,12 +244,11 @@ void sideways_thwomp_at_end(void){
     o->oAction = SIDEWAYS_THWOMP_RETURN;
 }
 void sideways_thwomp_return(void){
-    if (o->oPosZ * -o->oFlipDirection >= o->oHomeZ) {
+    if ((o->oPosZ - o->oHomeZ) * o->oFlipDirection <= 0.0f) {
         //o->oPosZ = o->oHomeZ;
         o->oAction = SIDEWAYS_THWOMP_WAIT;
     } else
     o->oPosZ -= 10.0f * o->oFlipDirection;
-
 }
 
 ObjActionFunc sSidewaysThwompActions[] = {
